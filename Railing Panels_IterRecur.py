@@ -22,29 +22,31 @@ def iterativePanel(lengthPanel):
         
 #elements needed prior run function
 crvIterative = rs.GetObject("Recursive Mode, Select curve to be use as rail", rs.filter.curve)
-
+#middle point on selected curve
 domain = rs.CurveDomain(crvIterative)
 t = domain[1]/2.0
 point = rs.EvaluateCurve(crvIterative, t)
 startPoint = rs.AddPoint(point)
 
-#startPoint = rs.CurveStartPoint(crvIterative)
-
 def recursivePanel(startPoint, lengthPanel):
+"""it works only with this rules:
+circle just cut crv in two points, this means crv is more
+or less strait and do not have flowers on int"""
     
     #building the core
     circleAux = rs.AddCircle(startPoint, lengthPanel)
     pEnd = rs.CurveCurveIntersection(crvIterative, circleAux)
     
-    if pEnd:
-	#second middle curve
-        panelA = rs.AddLine(startPoint, pEnd[1][1])
-        recursivePanel(pEnd[1][1], lengthPanel)
-	
-	#first middle curve, not working
-	#panelB = rs.AddLine(startPoint, pEnd[0][2])
-        #recursivePanel(pEnd[0][2], lengthPanel)
+    if len(pEnd) == 2:
+        #first middle curve
+        panelA = rs.AddLine(startPoint, pEnd[0][1])
+        recursivePanel(pEnd[0][1], lengthPanel)
         
-        
-#iterativePanel(3)
+        #second middle curve
+        #not working... perhaps it worth make a copy of elements to be reused
+        #panelB = rs.AddLine(startPoint, pEnd2[1][1])
+        #recursivePanel(pEnd[1][1], lengthPanel)
+    
+    
+#iterativePanel(2)
 recursivePanel(startPoint, 3)
